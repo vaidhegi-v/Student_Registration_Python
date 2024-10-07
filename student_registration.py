@@ -1,142 +1,149 @@
-detail={}
-login_li=[]
-review_dict={}
-li=[]
-term_dict={}
+detail = {}
+login_li = []
+review_dict = {}
+li = []
+term_dict = {}
+
 def signup():
-    username=input("Create Your Username: ")
-    password=input("Create Your Password: ")
+    username = input("Create Your Username: ")
+    password = input("Create Your Password: ")
     if username in detail:
-        print("Username is already exist")
+        print("Username already exists")
     elif username in term_dict:
-        print("You are terminated by the Admin..Pay the fine amount to signup")
+        print("You are terminated by the Admin. Pay the fine amount to signup")
     else:
-        detail.setdefault(username,password)
-        print("You are signup successfully completed")
+        detail[username] = password
+        print("Signup completed successfully")
+
 def login():
-    global login_id
-    login_id = input("Enter Your Username: ")
-    login_password = input("Enter Your Password: ")
-    if login_id in detail and detail[login_id] == login_password and login_id not in li:
-        print("You are successfully logged in")
-        login_li.append(login_id)
-        li.append(login_id)
-    elif login_id not in login_li:
-        print("You are terminated by the Admin..Pay the fine amount to login")
-    elif login_id in li:
-        li.append(login_id)
-        print("You are already in") 
+    username = input("Enter Your Username: ")
+    password = input("Enter Your Password: ")
+    if username in detail and detail[username] == password and username not in li:
+        print("Logged in successfully")
+        login_li.append(username)
+        li.append(username)
+    elif username in term_dict:
+        print("You are terminated by the Admin. Pay the fine amount to login")
+    elif username in li:
+        print("You are already logged in")
     else:
-        print("Incorrect login or password")           
+        print("Incorrect login or password")
+
 def logout():
-    logout_id=input("Enter Your Username: ")
-    if logout_id in login_li:
-        print("successfully loged out, Goodbye",logout_id)
-        login_li.remove(logout_id)
-        li.remove(logout_id)
+    username = input("Enter Your Username: ")
+    if username in login_li:
+        print(f"Goodbye, {username}")
+        login_li.remove(username)
+        li.remove(username)
     else:
-        print("Your account is not loged in")
+        print("Your account is not logged in")
+
 def admin_login():
-    admin_id="vaidhegi"
-    admin_password=input("Enter Password: ")
-    if admin_password=="uniq" and admin_password not in li:
+    admin_id = "vaidhegi"
+    password = input("Enter Admin Password: ")
+    if password == "uniq" and admin_id not in li:
         li.append(admin_id)
         print("Admin logged in successfully")
-    elif admin_password in li:
-        li.append(admin_id)
-        print("Already Admin is logged-in")
+    elif admin_id in li:
+        print("Admin is already logged in")
     else:
         print("Invalid Admin Password")
+
 def admin_logout():
-    admin_password=input("Enter Password: ")
-    if admin_password in li:
+    password = input("Enter Admin Password: ")
+    if password == "uniq" and "vaidhegi" in li:
+        li.remove("vaidhegi")
         print("Admin logged out successfully")
-        li.remove(admin_id)
-    elif admin_password=="uniq" and admin_password not in li:
-        print("Admin hasn't logged in")
     else:
-        print("Invalid Admin Password")
+        print("Admin hasn't logged in or invalid password")
+
 def write_review():
-    if li[-1]!="vaidhegi":
-        review=input("Write a review: ")
-        review_dict.setdefault(login_id,review)
+    if li and li[-1] != "vaidhegi":
+        review = input("Write a review: ")
+        review_dict[login_li[-1]] = review
     else:
-        print("Only user can write review")
+        print("Only users can write reviews")
+
 def read_review():
-    if li[-1]=="vaidhegi":
-        for i in review_dict:
-            print(i,"'s review is",review_dict[i])
+    if li and li[-1] == "vaidhegi":
+        for user, review in review_dict.items():
+            print(f"{user}'s review: {review}")
     else:
         print("Only Admin can read reviews")
+
 def delete_review():
-    if li[-1]=="vaidhegi":
-        del_review_id=input("Enter the user name for delete review: ")
-        if del_review_id in detail:
-            review_dict.pop(del_review_id)
+    if li and li[-1] == "vaidhegi":
+        user = input("Enter the username to delete review: ")
+        if user in review_dict:
+            review_dict.pop(user)
+            print("Review deleted")
         else:
-            print("No user in this name")
+            print("No such user")
     else:
         print("Only Admin can delete reviews")
+
 def terminate_user():
-    if li[-1]=="vaidhegi":
-        terminat_user=input("Enter the user name to terminate review: ")
-        if terminat_user in detail:
-            login_li.remove(terminat_user)
-            li.remove(terminat_user)
-            x=detail.pop(terminat_user)
-            term_dict.setdefault(terminat_user,x)
+    if li and li[-1] == "vaidhegi":
+        user = input("Enter the username to terminate: ")
+        if user in detail:
+            term_dict[user] = detail.pop(user)
+            login_li.remove(user)
+            li.remove(user)
+            print(f"User {user} terminated")
         else:
-            print("No user in this username")   
+            print("No such user")
     else:
-        print("Only Admin can terminate user")
+        print("Only Admin can terminate users")
+
 def loggedin_list():
-    if li[-1]=="vaidhegi":
-        lo_li=set(li)
-        print(list(lo_li))
+    if li and li[-1] == "vaidhegi":
+        print(f"Logged in users: {list(set(li))}")
     else:
-        print("Only Admin can see logged-in user names")
-def fine_amount():
-    fine_id=input("Enter the user name to pay fine: ")
-    fine_password=input("Enter the password: ")
-    if fine_id in term_dict and fine_password==term_dict[fine_id]:
-        fine=int(input("Enter the fine amount: "))
-        if fine>=500:
-            detail.setdefault(fine_id,fine_password)
+        print("Only Admin can see logged-in users")
+
+def pay_fine():
+    user = input("Enter your username to pay fine: ")
+    password = input("Enter your password: ")
+    if user in term_dict and term_dict[user] == password:
+        fine = int(input("Enter the fine amount: "))
+        if fine >= 500:
+            detail[user] = term_dict.pop(user)
+            print("Fine paid, account restored")
         else:
-            print("The minimum fine amount is Rs.500")
-    elif fine_id not in term_dict and fine_id in detail:
-        print("You don't have any fine to pay")
+            print("Minimum fine amount is Rs.500")
+    elif user in detail:
+        print("You don't have any fines to pay")
     else:
-        print("User is unidentified")
-           
+        print("User not found")
+
 while True:
-    print("\n 1.Sign Up \n 2.Login \n 3.Logout \n 4.Admin login \n 5.Admin logout \n 6.Write Review \n 7.Read User Reviws \n 8.Delete User Reviws \n 9.Terminate User \n 10.List Logged-in Users \n 11.Pay Fine \n 12.Exit")
-    a=int(input("Enter your choice: "))
-    
-    if a==1:      
+    print("\n1.Sign Up \n2.Login \n3.Logout \n4.Admin login \n5.Admin logout \n6.Write Review \n7.Read Reviews \n8.Delete Review \n9.Terminate User \n10.List Logged-in Users \n11.Pay Fine \n12.Exit")
+    choice = int(input("Enter your choice: "))
+
+    if choice == 1:
         signup()
-    elif a==2:
+    elif choice == 2:
         login()
-    elif a==3:
+    elif choice == 3:
         logout()
-    elif a==4:
+    elif choice == 4:
         admin_login()
-    elif a==5:
+    elif choice == 5:
         admin_logout()
-    elif a==6:
+    elif choice == 6:
         write_review()
-    elif a==7:
+    elif choice == 7:
         read_review()
-    elif a==8:
+    elif choice == 8:
         delete_review()
-    elif a==9:
+    elif choice == 9:
         terminate_user()
-    elif a==10:
+    elif choice == 10:
         loggedin_list()
-    elif a==11:
-        fine_amount()
-    elif a==12:
-        print("Thank you for coming our site, come soon")
+    elif choice == 11:
+        pay_fine()
+    elif choice == 12:
+        print("Thank you! Come again")
         break
     else:
-        print("Invalid process")
+        print("Invalid choice")
